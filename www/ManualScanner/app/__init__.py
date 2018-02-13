@@ -15,11 +15,6 @@ def create_app():
     app.config.from_object(app_config["production"])
     app.config.from_pyfile('config.py')
     Bootstrap(app)
-#    app.config['CELERY_BROKER_URL'] = 'amqp://art:hVhRU8cNPAnpaBy4@localhost/art'
- #   app.config['CELERY_RESULT_BACKEND'] = 'amqp://art:hVhRU8cNPAnpaBy4@localhost/art'
-
-#    celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-#    celery.conf.update(app.config)
 
     from .home import home as home_blueprint
     app.register_blueprint(home_blueprint)
@@ -35,5 +30,17 @@ def create_app():
     @app.route("/robots.txt")
     def robots_txt():
 	return send_file('/var/www/ManualScanner/app/templates/robots.txt', attachment_filename='robots.txt')
+
+    @app.route('/credits', methods=['GET'])
+    def give_credits():
+        return render_template('home/credits.html')
+
+    @app.route('/security', methods=['GET'])
+    def security_report():
+	return render_template('vulnerability.html')
+
+    @app.route('/agreement', methods=['GET'])
+    def agreement():
+	return render_template('terms.html')
 
     return app
