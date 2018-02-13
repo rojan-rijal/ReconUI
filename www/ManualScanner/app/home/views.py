@@ -14,8 +14,7 @@ def homepage():
     """
     Render the homepage template on the / route
     """
-    test_array = ['hi','ok']
-    return render_template('home/index.html', test_array=test_array)
+    return render_template('home/index.html')
 	
 @home.route('/scanner', methods=['GET', 'POST'])
 def manual_recon():
@@ -32,7 +31,7 @@ def manual_recon():
 		flash(".gov domains are not allowed")
 		return render_template('home/manual/manual.html', form = form, title="Manual Scanning")
 	else:
-		if form.beta_key.data == '398311c2-c521-42fa-9be7-6923cbe30028':
+		if form.beta_key.data == 'PRIVATE_KEY':
 			domain = form.url.data
 			domain_target_tld = get_tld(domain, as_object=True)
 			domain_target = domain_target_tld.domain + "." + domain_target_tld.suffix
