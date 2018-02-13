@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block body %}
+<div class="container">
+	<div class="content-section">
+		<div class="jumbotron">
+			<h2><center>Welcome to scan.bugbounty.site</center></h2>
+			<p>scan.bugbounty.site is an online web application recon tool free for use for all hackers. Through this application, you can find information regarding your target and also be able to find some basic vulnerabilities.</p>
+			<p>We are still enhancing the application with more features so currently, this is only open for selected hackers. If you want to be a beta tester of the application and give feedback, please email bugbountysite@gmail.com.</p>
+			<h3>Specification:</h3>
+			<p>Currently scan.bugbounty.site does multiple types of scan against a target. The design behind this application is to make sure researchers can use this to do 90%+ of their reconnaissance against a target.</p>
+			<p>While it is still on construction mode, scanner currently supports following things:</p>
+			<ul>
+				<li>DNS Scan (A, MX, NS).</li>
+				<li>Subdomain scanning with auto takeovers for some services.</li>
+				<li>Report generation upon successful subdomain takeover.</li>
+				<li>Censys assets search</li>
+				<li>S3 Bucket scanner</li>
+				<li>Publicly showcased vulnerabilities</li>
+				<li>Bruteforce directories for root domain</li>
+			</ul>
+			<p>Planned future update will include additional features:</p>
+			<ul>
+				<li>Search keywords for dorkings/github recon.</li>
+				<li>Mini Directory Bruteforce for each subdomains.</li>
+			</ul>
+			<p>If you want to support this project, please donate to this BTC wallet: 1Nu1W9A8VQ9QyYKFWNB9KdtWStDLE84E1j</p>
+			<script src="https://liberapay.com/bugbounty.site/widgets/button.js"></script>
+			<noscript><a href="https://liberapay.com/bugbounty.site/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+		</div>
+	</div>
+</div>
+{% endblock %}

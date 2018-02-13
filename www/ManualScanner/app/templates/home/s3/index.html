@@ -1,0 +1,61 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block title %}
+Manual Recon
+{% endblock %}
+{% block body %}
+      <div class="container">
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <form action="#" class="form">
+            <h3><center>s3 Bucket Search Engine</center></h3>
+            <p><center>This system updates every 24 hrs.</center></p>
+            <input class="form-control" id="s3" name="s3" type="text" placeholder='Search by company name' />
+          </form>
+        </div>
+      </div>
+    </div>
+  <script src='https://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js'></script>
+<script src='https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js'></script>
+<script src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js'></script>
+<br>
+<table id = "data">
+</table>
+
+ <script>
+           var client = algoliasearch('U528LYS5H9', '9af997829ca487a4aa1ea286a91ee84b');
+      var index = client.initIndex('s3buckets');
+
+      $('#s3').autocomplete({ hint: true, minLength: 3,debug: true }, [
+        { 
+          
+          source: function(q, cb) {
+            index.search(q, { hitsPerPage: 5 }, function(error, content) {
+              if (error) {
+                cb([]);
+                return;
+              }
+              cb(content.hits, content);
+            });
+          },
+          displayKey: 'name',
+          templates: {
+            suggestion: function(suggestion) {
+                i=0;
+                bucket_val="<tr><th><center>Buckets</center></th><th><center>ACLs</center></th></tr>";
+                acl="";
+                while(i < suggestion.buckets.length){
+                    bucket_val += "<tr><td><center>"+suggestion.buckets[i]+"</center></td><td><center>"+suggestion.acl[i]+"</center></td></tr>";
+                    i++;
+                }
+                document.getElementById("data").innerHTML = bucket_val;
+            }
+          }
+        }
+        
+      ]);
+      
+ </script>
+  <br>
+  <p>Read this <a href="http://blog.rojanrijal.com/2017/12/public-s3-bucket-search-engine-open.html">blog</a> to understand more about the project and its use case at this state:</a>
+{% endblock %}

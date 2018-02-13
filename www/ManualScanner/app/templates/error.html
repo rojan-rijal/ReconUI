@@ -1,0 +1,21 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+<div class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="intro-message">
+		    {{ utils.flashed_messages() }}
+                    <h1>Something went wrong</h1>
+                    <h3>We hit a snag!</h3>
+		    <h3>{{ domain }}</h3>
+                    <hr class="intro-divider">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

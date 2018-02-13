@@ -1,0 +1,4 @@
+Subdomain takeover with aws s3 
+
+_______________________________
+scan.bugbounty.site
