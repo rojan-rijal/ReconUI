@@ -32,7 +32,7 @@ def manual_recon():
 		flash(".gov domains are not allowed")
 		return render_template('home/manual/manual.html', form = form, title="Manual Scanning")
 	else:
-		if form.beta_key.data == 'PRIVATE_KEY':
+		if form.beta_key.data == '398311c2-c521-42fa-9be7-6923cbe30028':
 			domain = form.url.data
 			domain_target_tld = get_tld(domain, as_object=True)
 			domain_target = domain_target_tld.domain + "." + domain_target_tld.suffix
@@ -40,13 +40,13 @@ def manual_recon():
 			ns = dnsrecord(domain_target, 'NS')
 			mx = dnsrecord(domain_target, 'MX')
 			subdomains = subdomain.apply_async(args=[urllib.quote(domain_target),], link=[services.s(),corsscan.s(),dirsearch.s()])
-			#assets = censysassets.delay(urllib.quote(domain_target))
-			#public_xss = openbbp.delay(urllib.quote(domain_target))
+			assets = censysassets.delay(urllib.quote(domain_target))
+			public_xss = openbbp.delay(urllib.quote(domain_target))
 			#s3buckets = s3bucketscanner.delay(domain)
 			company = form.company.data
 			if not subdomains.ready() or not assets.ready() or not s3buckets.ready() or not public_xss.ready():
 				return render_template('home/manual/scanning.html', domain = urllib.quote(domain_target),
-							subdomains = subdomains, a=a, ns=ns, mx=mx, uuid=user_uuid)
+							subdomains = subdomains, a=a, ns=ns, mx=mx, uuid=user_uuid, assets = assets, public_xss = public_xss)
 			return render_template('home/manual/scanning.html', length = length, 
 						subdomains=subdomains, a = a, ns = ns,
 						mx = mx, domain = domain_target, uuid=user_uuid)
@@ -66,18 +66,23 @@ def check_task(id):
    res = subdomain.AsyncResult(id)
    if res.ready():
 	output = "true"
-	static_domain = '{"result":"true","results":[],"subtasks":[], "vulnerable":[]}'
+	static_domain = '{"result":"true","results":[],"subtasks":[], "stats":[]}'
         load_static = json.loads(static_domain)
 	for domain in res.result[0]:
 		load_static['results'].append(domain)
 	for stats in res.result[1]:
-		load_static['vulnerable'].append(stats)
-	if len(res.children[0]) > 0:
-		for children in res.children[0]:
-			load_static['subtasks'].append(children.id)
-	datas = ""
-	datas = json.dumps(load_static)
-	return datas
+		load_static['stats'].append(stats)
+	try:
+		if len(res.children[0]) > 0:
+			for children in res.children[0]:
+				load_static['subtasks'].append(children.id)
+		datas = ""
+		datas = json.dumps(load_static)
+		return datas
+	except:
+		datas = ""
+		datas = json.dumps(load_static)
+		return datas
    else: 
 	static_domain = '{"result":"false","domains":[],"stats":[]}'
 	return static_domain
@@ -133,15 +138,6 @@ def htakeover(domain, temp_id):
 		return redirect(url_for('home.manual_recon'))
 
 
-@home.route('/credits', methods=['GET'])
-def give_credits():
-        return render_template('home/credits.html')
-
-
-@home.route('/security', methods=['GET'])
-def security_report():
-	return render_template('vulnerability.html')
-
 
 @home.route('/download/<string:filename>', methods=['GET'])
 def download_report(filename):
@@ -154,7 +150,3 @@ def download_report(filename):
 @home.route('/github/', methods=['GET'])
 def github_search():
 	return render_template('home/github.html')
-
-@home.route('/agreement', methods=['GET'])
-def agreement():
-	return render_template('terms.html')
