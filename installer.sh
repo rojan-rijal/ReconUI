@@ -2,7 +2,7 @@ echo "Starting installation. Please hold on. This will take time"
 echo "Starting with good old system update"
 sudo apt-get -y update
 echo "Install pip"
-sudo apt-get install -y python-pip ruby apache2 python-dev supervisor libapache2-mod-wsgi curl rabbitmq-server libcurl4-openssl-dev libssl-dev
+sudo apt-get install -y python-pip ruby apache2 python-dev supervisor libapache2-mod-wsgi curl rabbitmq-server libcurl4-openssl-dev libssl-dev zip
 sudo apt-get update
 sudo pip install --upgrade pip
 echo "Time to install pip modules"
