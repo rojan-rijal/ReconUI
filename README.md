@@ -1,5 +1,5 @@
 # ReconUI
-Development code of Recon UI
+Alpha version code of ReconUI
 
 
 # Installation
