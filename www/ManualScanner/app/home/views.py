@@ -1,8 +1,7 @@
-import threading, urllib, uuid, json, validators
 from tld import get_tld
 from time import sleep
 from flask import render_template, flash, redirect, url_for, session, send_file
-from helpers import dnsrecord, subdomain, s3takeover, censysassets, herokutakeover, s3bucketscanner, openbbp, dirsearch, services, corsscan
+from helpers import dnsrecord, subdomain, s3takeover, censysassets, herokutakeover, s3bucketscanner, openbbp, dirsearch, services, corsscan, screenshot
 from forms import ManualForm
 from celery.result import AsyncResult
 from . import home
@@ -38,14 +37,15 @@ def manual_recon():
         		a = dnsrecord(domain_target, 'A')
 			ns = dnsrecord(domain_target, 'NS')
 			mx = dnsrecord(domain_target, 'MX')
-			subdomains = subdomain.apply_async(args=[urllib.quote(domain_target),], link=[services.s(),corsscan.s(),dirsearch.s()])
+			subdomains = subdomain.apply_async(args=[urllib.quote(domain_target),], link=[services.s(),corsscan.s(),dirsearch.s(),screenshot.s()])
 			assets = censysassets.delay(urllib.quote(domain_target))
 			public_xss = openbbp.delay(urllib.quote(domain_target))
-			#s3buckets = s3bucketscanner.delay(domain)
+			s3buckets = s3bucketscanner.delay(domain)
 			company = form.company.data
 			if not subdomains.ready() or not assets.ready() or not s3buckets.ready() or not public_xss.ready():
 				return render_template('home/manual/scanning.html', domain = urllib.quote(domain_target),
-							subdomains = subdomains, a=a, ns=ns, mx=mx, uuid=user_uuid, assets = assets, public_xss = public_xss)
+							subdomains = subdomains, a=a, ns=ns, mx=mx, uuid=user_uuid,
+							s3buckets = s3buckets, assets = assets, public_xss = public_xss)
 			return render_template('home/manual/scanning.html', length = length, 
 						subdomains=subdomains, a = a, ns = ns,
 						mx = mx, domain = domain_target, uuid=user_uuid)
@@ -68,9 +68,9 @@ def check_task(id):
 	static_domain = '{"result":"true","results":[],"subtasks":[], "stats":[]}'
         load_static = json.loads(static_domain)
 	for domain in res.result[0]:
-		load_static['results'].append(domain)
+		load_static['results'].append(domain.strip())
 	for stats in res.result[1]:
-		load_static['stats'].append(stats)
+		load_static['stats'].append(stats.strip())
 	try:
 		if len(res.children[0]) > 0:
 			for children in res.children[0]:
