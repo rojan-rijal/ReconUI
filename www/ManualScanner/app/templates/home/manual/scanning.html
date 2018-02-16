@@ -44,9 +44,7 @@
 	     <script>
 	     function check_job_status(){
 		var i;
-		var j = 0;
-		var k = 0;
-		var l = 0;
+		var j = k = l = m = 0;
 		var total_subdomains;
 		$.getJSON("{{ url_for('home.check_task', id=subdomains.id) }}", function(data){
 			switch (data['result']) {
@@ -57,13 +55,46 @@
 					for(i=0; i< total_subdomains; i++){
 						subdomains_html += '<div class="container">';
 						subdomains_html += '<h3><u>'+data['results'][i]+'</u></h3>';
+						subdomains_html += '<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modal-'+i+'">View Screenshot</button>';
+						subdomains_html += '<div class="modal fade" id="modal-'+i+'" role="dialog">';
+						subdomains_html += '<div class="modal-dialog">';
+						subdomains_html += '<div class="modal-content">';
+						subdomains_html += '<div class="modal-header">';
+						subdomains_html += '<h4 class="modal-title">'+data['results'][i]+'</h4>';
+						subdomains_html += '</div>';
+						subdomains_html += '<div class="modal-body">';
+						subdomains_html += '<p id="images-'+data['results'][i]+'">Taking screenshot <i class="fa fa-circle-o-notch fa-spin" style="color:green"></i></p>';
+                       		                function check_screenshot_status(){
+                                                        $.getJSON("/api/subtask/"+data['subtasks'][3], function(screenshot){
+                                                                switch (screenshot['result']) {
+                                                                        case "true":
+										image_html = "";
+										image_html = '<img src="https://urlscan.io/screenshots/'+screenshot['results'][m]+'.png" width="75%", height="75%">';
+										document.getElementById("images-"+data['results'][m]).innerHTML = image_html;
+										m += 1;
+										break;
+		                                                          case "false":
+        	                                                                        console.log('Taking Screenshots');
+                	                                                        setTimeout(function() {
+                        	                                                        check_screenshot_status();
+                                	                                        }, 10000);
+                                        	                        }
+                                                	        });
+                                                	}
+                                                check_screenshot_status();
+
+				
+						subdomains_html += '</div>';
+						subdomains_html += '<div class="modal-footer">';
+						subdomains_html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+						subdomains_html += '</div></div></div></div>';
 						vulnOrNot = data['stats'][i];
 						if (vulnOrNot.includes("Vulnerable-")){
 							subdomains_html += '<h4><font color="red"><i class="fa fa-warning" styles="color:red;"></i> Subdomain Vulnerable to takeover.</font></h4>';
 							if (vulnOrNot.includes("awss3")){
-								subdomains_html += '<a href="https://scan.bugbounty.site/takeover/'+data['results'][i]+'/{{uuid}}" class="btn btn-danger" role="button">Takeover Domain</a>';
+								subdomains_html += '<a href="/takeover/'+data['results'][i]+'/{{uuid}}" class="btn btn-danger" role="button">Takeover Domain</a>';
 							} else if (vulnOrNot.includes("heroku")){
-								subdomains_html += '<a href="https://scan.bugbounty.site/htakeover/'+data['results'][i]+'/{{uuid}}" class="btn btn-danger" role="button">Takeover Domain</a>';
+								subdomains_html += '<a href="/htakeover/'+data['results'][i]+'/{{uuid}}" class="btn btn-danger" role="button">Takeover Domain</a>';
 							}else {
 								subdomains_html += '<p>'+data['stats'][i]+'</p>';
 							}
@@ -74,7 +105,7 @@
 						subdomains_html += '<h4 class="sub-header"><i>Services</i></h4>';
 						subdomains_html += '<p id="services-'+data['results'][i]+'">Finding what services are running in this subdomain. Please wait <i class="fa fa-circle-o-notch fa-spin" style="color:green"></i></p>';
 						function check_service_status(){
-							$.getJSON("https://scan.bugbounty.site/api/subtask/"+data['subtasks'][0], function(services){
+							$.getJSON("/api/subtask/"+data['subtasks'][0], function(services){
 								switch (services['result']) {
 									case "true":
 										services_html = "";
@@ -106,7 +137,7 @@
 						subdomains_html += '<h4 class="sub-header"><i>Vulnerable to CORS?</i></h4>';
 						subdomains_html += '<p id="cors-'+data['results'][i]+'">Checking for CORS vulnerability <i class="fa fa-circle-o-notch fa-spin" style="color:green"></i></p>';
 						function check_cors_status(){
-							$.getJSON("https://scan.bugbounty.site/api/subtask/"+data['subtasks'][1], function(cors){
+							$.getJSON("/api/subtask/"+data['subtasks'][1], function(cors){
 								switch (cors['result']) {
 									case "true":
 										cors_html = "";
@@ -132,7 +163,7 @@
 						subdomains_html += '<h4 class="sub-header"><i>Found Directories</i></h4>';
 						subdomains_html += '<p id="directories-'+data['results'][i]+'">Bruteforcing directories <i class="fa fa-circle-o-notch fa-spin" style="color:green"></i></p>';
 						function check_dir_status(){
-							$.getJSON("https://scan.bugbounty.site/api/subtask/"+data['subtasks'][2], function(dirs){
+							$.getJSON("/api/subtask/"+data['subtasks'][2], function(dirs){
 								switch(dirs['result']) {
 									case "true":
 										dirs_html = "";
@@ -175,8 +206,8 @@
 	     check_job_status();
 	    </script>
 
-	    <p><u>Possible IPv4 protocols for this company</u></p>
-	    <p id="censys">Identifying IPv4 hosts</p>
+	    <h3><center><u>Possible IPv4 protocols for this company</u></center></h3>
+	    <p id="censys">Identifying IPv4 hosts <i class="fa fa-circle-o-notch fa-spin"></i></p>
             <script>
 	    function check_censys_status() {
 		$.getJSON("{{ url_for('home.check_task', id=assets.id) }}", function(data) {
@@ -204,8 +235,8 @@
 	    }
 	    check_censys_status();
 	    </script>
-	    <p><u>Previous and Recent public vulnerabilities</u></p>
-	    <p id="public_bugs">Searching</p>
+	    <h3><center><u>Previous and Recent public vulnerabilities</u></center></h3>
+	    <p id="public_bugs">Searching <i class="fa fa-circle-o-notch fa-spin"></i></p>
             <script>
 	    function check_vuln_status() {
 		$.getJSON("{{ url_for('home.check_task', id=public_xss.id) }}", function(data) {
@@ -233,6 +264,41 @@
 	    }
 	    check_vuln_status();
 	    </script>
+
+	    <h3><center><u>AWS S3 Buckets</u></center></h3>
+	    <p id="s3_buckets">Searching <i class="fa fa-circle-o-notch fa-spin"></i></p>
+            <script>
+	    function check_bucket_status() {
+		$.getJSON("{{ url_for('home.check_task', id=s3buckets.id) }}", function(data) {
+			switch (data['result']) {
+				case "true":
+					buck_data = "";
+					var bucks; 
+					buck_data += '<table class="table table-striped table-bordered table-hover"><thead><tr><th width="30%"> S3 Buckets </th><th width="30%"> ACL </th></tr></thead><tbody>';
+					for (bucks=0; bucks < data['results'].length; bucks++){
+						buck_data += '<tr>';
+						buck_data += '<td>'+data['results'][bucks]+'</td>';
+						if (data['stats'][bucks] == "All-Can-Read") {
+							buck_data += '<td><font color="red"><i class="fa fa-warning"></i> '+data['stats'][bucks]+'</td>';
+						} else {
+							buck_data += '<td>'+data['stats'][bucks]+'</td>';
+						}
+						buck_data += '</tr>';
+					}
+					buck_data += '</tbody></table>';
+					document.getElementById("s3_buckets").innerHTML = buck_data;
+					break;
+				case "false":
+					console.log("Searching for s3 Buckets");
+				setTimeout(function(){
+					check_bucket_status();
+				}, 10000);
+			}
+		});
+	    }
+	    check_bucket_status();
+	    </script>
+
 
 	    <h3><u>Possible Github mentions of {{ domain }}</u></h3>
 	    <p><a href='https://scan.bugbounty.site/github/?q="{{domain}}"' target="_blank">View on different window</a></p>
