@@ -38,3 +38,9 @@ Make sure you signup on Censys to get the API Key Id and Secret.
 5. Censys IPv4 lookups. 
 6. Public XSS search from open bug bounty. 
 7. Screenshot grab of each subdomains. 
+
+
+# Error debugging
+If one or more of the services do not work and you keep getting 500 Internal server error: 
+1. Make sure the API keys are valid. 
+2. Make sure that you have OpenSSL installed. If OpenSSL and its dependencies are not installed, a SSL Handshake Failure will likely happen when connecting to external site. 
