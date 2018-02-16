@@ -1,6 +1,6 @@
 from time import sleep
 from tld import get_tld
-import subprocess, os, requests, psutil, dns.resolver, json, urllib2, requests, uuid, urllib
+import subprocess, os, requests, psutil, dns.resolver, json, urllib2, requests, uuid, urllib, json
 from flask import render_template, flash, redirect, url_for, session
 import boto
 from boto.s3.connection import S3Connection
@@ -14,7 +14,7 @@ breaches = []
 f_uuid = ""
 taskapp = celery.Celery('app.home.helpers.subdomain', backend='amqp://', broker='amqp://')
 API_URL = "https://censys.io/api/v1/search/ipv4"
-UID = "CENSYS_UID"
+UID = "CENSYS_UUID"
 SECRET = "CENSYS_SECRET"
 
 def dnsrecord(domain, type):
@@ -162,7 +162,7 @@ def services(subdomain):
 @taskapp.task(name='app.home.helpers.herokutakeover')
 def herokutakeover(domain):
 	try:
-		herokutakeover = 'heroku domains:add '+urllib.quote(domain)+' --app bugbountysite'
+		herokutakeover = 'heroku domains:add '+urllib.quote(domain)+' --app APP_NAME'
 		subprocess.call(herokutakeover, shell=True)
 		return True
 	except:
@@ -216,9 +216,27 @@ def dirsearch(subdomains):
 					found_dirs.append(data['location'])
 			remove_command = "rm "+filename
 			subprocess.call(remove_command, shell=True)
-
+			if len(filter(None, found_dirs)) == 0:
+				found_dirs=['None found']
 			total_dir.append(found_dirs)
 		except:
 			found_dirs = ['None found']
 			total_dir.append(found_dirs)
 	return total_dir
+
+
+#urlscan api to take image
+@taskapp.task(name='app.home.helpers.screenshot')
+def screenshot(subdomains):
+	images = []
+	headers = {'Content-Type': 'application/json', 'API-Key':'URLSCAN_API'}
+	url = 'https://urlscan.io/api/v1/scan'
+	for subdomain in subdomains[0]:
+		subdomain = "https://"+subdomain
+		payload = '{"url":"%s"}' %  subdomain
+		send_scan = requests.post(url, data=payload, headers=headers)
+		result_json = json.loads(send_scan.text)
+		image_uuid = result_json['uuid']
+		images.append(image_uuid)
+		sleep(5.00)
+	return images
