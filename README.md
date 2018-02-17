@@ -39,6 +39,10 @@ Make sure you signup on Censys to get the API Key Id and Secret.
 6. Public XSS search from open bug bounty. 
 7. Screenshot grab of each subdomains. 
 
+# Videos:
+1. Showcasing the tool: https://www.youtube.com/watch?v=4XGsRhZ70BQ
+2. Installer script: https://www.youtube.com/watch?v=gUFlj-JHpbc
+
 
 # Error debugging
 If one or more of the services do not work and you keep getting 500 Internal server error: 
