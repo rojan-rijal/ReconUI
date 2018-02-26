@@ -7,7 +7,7 @@ class ManualForm(FlaskForm):
     """
     company = StringField('Company', validators=[DataRequired()])
     url = StringField('URL (Make sure to have either http:// or https://)', validators=[DataRequired(), URL(require_tld=True, message='Wrong Domain')])
-    beta_key = PasswordField('Beta users key', validators=[DataRequired()])
+    beta_key = PasswordField('Private key', validators=[DataRequired()])
     agreement = BooleanField('By checking this, you agree to the <a href="http://scan.bugbounty.site/agreement" target="_blank">Terms of Agreement</a>', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
